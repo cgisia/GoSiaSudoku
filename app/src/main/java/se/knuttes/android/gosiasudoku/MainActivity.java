@@ -2,6 +2,7 @@ package se.knuttes.android.gosiasudoku;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.TextView;
 
@@ -16,6 +17,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         wsCaller = new WsCaller(this);
         textView = (TextView) findViewById(R.id.textView);
+        textView.setMovementMethod(new ScrollingMovementMethod());
     }
 
     public void listSudokus(View view) {

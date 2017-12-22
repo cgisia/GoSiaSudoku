@@ -14,6 +14,10 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by antonssons on 2017-12-21.
@@ -30,7 +34,9 @@ public class WsCaller {
     }
 
     protected void getList(final Context context) {
+        parent.getTextView().setText("");
         RequestQueue queue = Volley.newRequestQueue(context);
+        Map<String, String> sudokuList = new HashMap<>();
 //        getSettingExternalDatabase(context);
         String url = "http://openshifttest-goran.193b.starter-ca-central-1.openshiftapps.com/rest/sudoku/list";
         Log.d(this.getClass().getName(), "URL: " + url);
@@ -41,43 +47,22 @@ public class WsCaller {
             public void onResponse(JSONArray response) {
                 try {
                     Log.d(this.getClass().getName(), "Response:\n" + response.toString(2));
-                    parent.getTextView().setText("");
                     parent.addText(response.toString(2) + '\n');
-//                    JSONObject xsearch = response.getJSONObject("xsearch");
-//                    int nrRecords = xsearch.getInt("records");
-//                    JSONArray list = xsearch.getJSONArray("list");
-//                    for(int i = 0; i < nrRecords; i++) {
-//                        JSONObject item = list.getJSONObject(i);
-//                        if(!item.isNull("title")) {
-//                            String title = item.getString("title");
-//                            title = TitleHelper.FormatTitle(title);
-//                            bookBaseDTO.setTitle(title);
-//                        }
-//                        if(!item.isNull("creator")) {
-//                            String author = item.getString("creator");
-//                            author = AuthorHelper.FormatAuthor(author);
-//                            bookBaseDTO.setAuthor(author);
-//                        }
-//                        if(!item.isNull("language")) {
-//                            String language = item.getString("language");
-//                            bookBaseDTO.setLanguage(language);
-//                        }
-//                        if(!item.isNull("isbn")) {
-//                            String isbn = item.getString("isbn");
-//                            if(SplitJsonList.isJsonList(isbn)) {
-//                                bookBaseDTO.setIsbn(SplitJsonList.getFirst(isbn));
-//                            } else {
-//                                bookBaseDTO.setIsbn(item.getString("isbn"));
-//                            }
-//                        }
-//                    }
+                    int nrRecords = response.length();
+                    parent.addText("# records: " + nrRecords + '\n');
+                    for(int i = 0; i < nrRecords; i++) {
+                        JSONObject item = response.getJSONObject(i);
+                        String id = item.getString("id");
+                        String status = item.getString("status");
+                        parent.addText("i=" + i + ": " + id + ' ' + status + '\n');
+                    }
 //                    setChanged();
 //                    notifyObservers(bookBaseDTO);
-                    Toast.makeText(context, "WS request sent!", Toast.LENGTH_LONG).show();
-                } catch(JSONException e) {
-                    Log.e(this.getClass().getName(), "Det blev ett exception! " + e.getMessage());
+                        Toast.makeText(context, "WS request sent!", Toast.LENGTH_LONG).show();
+                    } catch(JSONException e){
+                        Log.e(this.getClass().getName(), "Det blev ett exception! " + e.getMessage());
+                    }
                 }
-            }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
@@ -86,8 +71,7 @@ public class WsCaller {
                     Toast.makeText(context, "URL not valid!", Toast.LENGTH_LONG).show();
                 }
             }
-        }
-        );
+        });
 
         jsRequest.setRetryPolicy(new DefaultRetryPolicy(2 * 1000, 2, 2.0f));
         queue.add(jsRequest);
